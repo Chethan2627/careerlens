@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CareerLens — AI Resume Scorer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #0a0a0f; --ink2: #111118; --ink3: #1a1a24;
+      --line: rgba(255,255,255,0.07);
+      --lime: #c8f135; --lime2: #a8d420;
+      --blue: #4f8eff; --pink: #ff5f8d; --purple: #9b6dff;
+      --text: #eeeef5; --muted: #7878a0; --muted2: #4a4a6a;
+    }
+    body { background: var(--ink); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(200,241,53,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(200,241,53,0.02) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+    .blob { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
+    .blob-1 { width: 500px; height: 500px; background: rgba(200,241,53,0.06); top: -150px; right: -100px; }
+    .blob-2 { width: 400px; height: 400px; background: rgba(79,142,255,0.07); bottom: -100px; left: -100px; }
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+    nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 64px; background: rgba(10,10,15,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--line); }
+    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px; display: flex; align-items: center; gap: 8px; }
+    .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 10px var(--lime); animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .nav-pill { background: rgba(200,241,53,0.1); border: 1px solid rgba(200,241,53,0.2); border-radius: 100px; padding: 6px 16px; font-size: 12px; color: var(--lime); letter-spacing: 1px; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    @keyframes reveal { to{clip-path:inset(0 0% 0 0)} }
+    .hero { padding: 72px 0 48px; text-align: center; }
+    .hero-tag { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 100px; padding: 8px 20px; font-size: 12px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 32px; }
+    .hero-tag span { color: var(--lime); }
+    h1 { font-family: 'Syne', sans-serif; font-size: clamp(36px, 6vw, 68px); font-weight: 800; line-height: 1.0; letter-spacing: -2px; margin-bottom: 24px; }
+    .h1-accent { color: white; position: relative; display: inline-block; }
+    .h1-accent::after { content: 'Land your dream job.'; position: absolute; left: 0; top: 0; background: linear-gradient(90deg, var(--lime), #7fff6b); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; clip-path: inset(0 100% 0 0); animation: reveal 1.2s 0.3s cubic-bezier(0.77,0,0.18,1) forwards; }
+    .hero-sub { color: var(--muted); font-size: 17px; max-width: 520px; margin: 0 auto 48px; line-height: 1.7; font-weight: 300; }
+    .steps-bar { display: flex; align-items: center; justify-content: center; margin-bottom: 56px; }
+    .step-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .step-bubble { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; border: 1.5px solid var(--line); color: var(--muted2); background: var(--ink2); transition: all 0.3s; cursor: pointer; }
+    .step-bubble.active { border-color: var(--lime); color: var(--ink); background: var(--lime); box-shadow: 0 0 20px rgba(200,241,53,0.3); }
+    .step-bubble.done { border-color: var(--lime); color: var(--lime); background: rgba(200,241,53,0.1); }
+    .step-label { font-size: 11px; color: var(--muted2); letter-spacing: 0.5px; }
+    .step-line { width: 80px; height: 1px; background: var(--line); margin: 0 4px 20px; transition: background 0.3s; }
+    .step-line.done { background: rgba(200,241,53,0.4); }
+    .panel { display: none; animation: fadeUp 0.4s ease; }
+    .panel.active { display: block; }
+    .section-label { font-family: 'Syne', sans-serif; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 24px; text-align: center; }
+    .degree-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 32px; }
+    .degree-card { background: var(--ink2); border: 1px solid var(--line); border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.25s; display: flex; align-items: center; gap: 14px; }
+    .degree-card:hover { border-color: rgba(200,241,53,0.3); background: var(--ink3); transform: translateY(-2px); }
+    .degree-card.selected { border-color: var(--lime); background: rgba(200,241,53,0.06); box-shadow: 0 0 0 1px rgba(200,241,53,0.2); }
+    .deg-icon { font-size: 28px; flex-shrink: 0; }
+    .deg-name { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; line-height: 1.3; }
+    .deg-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .btn-primary { width: 100%; padding: 18px; background: var(--lime); border: none; border-radius: 14px; color: var(--ink); font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s; margin-top: 8px; }
+    .btn-primary:hover:not(:disabled) { background: var(--lime2); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(200,241,53,0.3); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-ghost { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--line); border-radius: 12px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; margin-top: 12px; transition: all 0.2s; }
+    .btn-ghost:hover { border-color: var(--muted2); color: var(--text); }
+    .back-btn { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; cursor: pointer; background: none; border: none; padding: 0; margin-bottom: 32px; transition: color 0.2s; }
+    .back-btn:hover { color: var(--text); }
+    .selected-banner { background: var(--ink2); border: 1px solid var(--line); border-radius: 14px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    .chip { background: rgba(200,241,53,0.1); border: 1px solid rgba(200,241,53,0.2); color: var(--lime); border-radius: 100px; padding: 4px 14px; font-size: 12px; font-weight: 600; }
+    .role-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 32px; }
+    .role-card { background: var(--ink2); border: 1px solid var(--line); border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.2s; text-align: center; }
+    .role-card:hover { border-color: rgba(79,142,255,0.4); transform: translateY(-2px); }
+    .role-card.selected { border-color: var(--blue); background: rgba(79,142,255,0.08); }
+    .role-icon { font-size: 24px; margin-bottom: 8px; }
+    .role-name { font-size: 13px; font-weight: 500; }
+    .drop-zone { border: 2px dashed rgba(200,241,53,0.2); border-radius: 20px; padding: 64px 40px; text-align: center; cursor: pointer; transition: all 0.3s; background: var(--ink2); position: relative; }
+    .drop-zone:hover { border-color: var(--lime); background: rgba(200,241,53,0.04); }
+    .drop-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+    .upload-icon-big { width: 80px; height: 80px; border-radius: 20px; background: rgba(200,241,53,0.1); border: 1px solid rgba(200,241,53,0.2); font-size: 36px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+    .upload-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .upload-sub { color: var(--muted); font-size: 14px; }
+    .format-tags { display: flex; gap: 8px; justify-content: center; margin-top: 16px; }
+    .ftag { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 6px; padding: 4px 12px; font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+    .file-ok { display: none; align-items: center; gap: 14px; background: rgba(200,241,53,0.07); border: 1px solid rgba(200,241,53,0.2); border-radius: 14px; padding: 18px 24px; margin-top: 16px; }
+    .file-ok.show { display: flex; }
+    .file-ok-name { color: var(--lime); font-weight: 500; }
+    .file-ok-size { font-size: 12px; color: var(--muted); }
+    .loading-screen { display: none; text-align: center; padding: 80px 40px; }
+    .loading-screen.show { display: block; }
+    .scan-anim { width: 100px; height: 100px; margin: 0 auto 32px; position: relative; }
+    .scan-ring { width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(200,241,53,0.15); position: absolute; }
+    .scan-spin { width: 100%; height: 100%; border-radius: 50%; border: 2px solid transparent; border-top-color: var(--lime); position: absolute; animation: spin 1s linear infinite; }
+    .scan-inner { position: absolute; inset: 20px; border-radius: 50%; background: rgba(200,241,53,0.08); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+    .load-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+    .load-sub { color: var(--muted); margin-bottom: 32px; }
+    .load-steps { max-width: 300px; margin: 0 auto; }
+    .lstep { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--muted2); transition: color 0.3s; }
+    .lstep:last-child { border: none; }
+    .lstep.active { color: var(--lime); }
+    .lstep-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .score-hero { background: var(--ink2); border: 1px solid var(--line); border-radius: 24px; padding: 48px; text-align: center; margin-bottom: 20px; }
+    .score-ring { width: 160px; height: 160px; margin: 0 auto 20px; position: relative; }
+    .score-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 10; }
+    .ring-fill { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1.5s cubic-bezier(0.34,1.56,0.64,1); }
+    .ring-num { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .ring-num .num { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800; color: var(--lime); line-height: 1; }
+    .ring-num .den { font-size: 13px; color: var(--muted); }
+    .grade-tag { display: inline-block; background: rgba(200,241,53,0.1); border: 1px solid rgba(200,241,53,0.25); color: var(--lime); border-radius: 100px; padding: 6px 20px; font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 12px; }
+    .score-summary { color: var(--muted); max-width: 600px; margin: 0 auto 24px; line-height: 1.7; }
+    .mini-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+    .mini-stat { background: var(--ink3); border: 1px solid var(--line); border-radius: 12px; padding: 16px; text-align: center; }
+    .mini-stat .val { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+    .mini-stat .lbl { font-size: 11px; color: var(--muted); }
+    .res-card { background: var(--ink2); border: 1px solid var(--line); border-radius: 20px; padding: 28px; margin-bottom: 16px; }
+    .res-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .two-col .res-card { margin-bottom: 0; }
+    .bar-item { margin-bottom: 18px; }
+    .bar-head { display: flex; justify-content: space-between; margin-bottom: 7px; }
+    .bar-name { font-size: 13px; font-weight: 500; }
+    .bar-val { font-size: 12px; color: var(--muted); }
+    .bar-track { height: 6px; background: rgba(255,255,255,0.05); border-radius: 100px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 100px; transition: width 1.4s cubic-bezier(0.34,1.56,0.64,1); }
+    .bar-fb { font-size: 12px; color: var(--muted); margin-top: 5px; line-height: 1.5; }
+    .issue { border-radius: 12px; padding: 16px; margin-bottom: 10px; border-left: 3px solid; }
+    .issue.high { background: rgba(255,95,141,0.07); border-color: var(--pink); }
+    .issue.medium { background: rgba(255,180,50,0.07); border-color: #ffb432; }
+    .issue.low { background: rgba(79,142,255,0.07); border-color: var(--blue); }
+    .issue-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .sev { font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 100px; text-transform: uppercase; letter-spacing: 1px; }
+    .high .sev { background: rgba(255,95,141,0.15); color: var(--pink); }
+    .medium .sev { background: rgba(255,180,50,0.15); color: #ffb432; }
+    .low .sev { background: rgba(79,142,255,0.15); color: var(--blue); }
+    .issue-title { font-size: 14px; font-weight: 600; }
+    .issue-desc { color: var(--muted); font-size: 13px; margin-bottom: 10px; line-height: 1.6; }
+    .fix-box { background: rgba(200,241,53,0.07); border: 1px solid rgba(200,241,53,0.15); border-radius: 8px; padding: 8px 12px; font-size: 13px; color: var(--lime); display: flex; gap: 6px; }
+    .step-row { display: flex; gap: 16px; background: var(--ink3); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 10px; }
+    .step-num { width: 36px; height: 36px; flex-shrink: 0; border-radius: 10px; background: linear-gradient(135deg, var(--lime), #7fff6b); color: var(--ink); font-family: 'Syne', sans-serif; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .step-area { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .step-prob { color: var(--pink); font-size: 12px; margin-bottom: 6px; }
+    .step-action { color: var(--text); font-size: 12px; line-height: 1.6; }
+    .step-example { background: rgba(79,142,255,0.08); border-left: 2px solid var(--blue); padding: 6px 10px; border-radius: 0 6px 6px 0; font-size: 11px; color: var(--muted); margin-top: 6px; font-style: italic; }
+    .tag-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag { border-radius: 100px; padding: 5px 14px; font-size: 12px; }
+    .tag-green { background: rgba(200,241,53,0.1); border: 1px solid rgba(200,241,53,0.2); color: var(--lime); }
+    .tag-blue { background: rgba(79,142,255,0.1); border: 1px solid rgba(79,142,255,0.2); color: var(--blue); }
+    .tag-pink { background: rgba(255,95,141,0.1); border: 1px solid rgba(255,95,141,0.2); color: var(--pink); }
+    .job-card { background: var(--ink3); border: 1px solid var(--line); border-radius: 16px; padding: 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px; transition: all 0.2s; cursor: pointer; }
+    .job-card:hover { border-color: rgba(200,241,53,0.25); transform: translateX(4px); }
+    .job-logo { width: 52px; height: 52px; border-radius: 14px; background: var(--ink2); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+    .job-info { flex: 1; }
+    .job-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .job-company { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    .job-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .jtag { font-size: 11px; padding: 3px 10px; border-radius: 6px; background: rgba(255,255,255,0.04); border: 1px solid var(--line); color: var(--muted); }
+    .job-right { text-align: right; flex-shrink: 0; }
+    .job-salary { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--lime); margin-bottom: 6px; }
+    .job-apply { font-size: 12px; color: var(--blue); text-decoration: none; }
+    .job-apply:hover { text-decoration: underline; }
+    @media(max-width:768px) { nav{padding:0 20px} .wrap{padding:0 16px} h1{letter-spacing:-1px} .mini-stats{grid-template-columns:1fr 1fr} .two-col{grid-template-columns:1fr} .degree-grid{grid-template-columns:1fr 1fr} }
+  </style>
+</head>
+<body>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <nav>
+    <div class="nav-logo"><div class="nav-dot"></div>CareerLens</div>
+    <div class="nav-pill">🇮🇳 India Jobs</div>
+  </nav>
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-tag">✦ <span>AI Powered</span> Resume Intelligence</div>
+      <h1>Score your resume.<br/><span class="h1-accent">Land your dream job.</span></h1>
+      <p class="hero-sub">Upload your resume, pick your target role, and get an AI-powered score, fix plan, and live job matches — built for Indian job seekers.</p>
+      <div class="steps-bar">
+        <div class="step-wrap"><div class="step-bubble active" id="sb1">1</div><div class="step-label">Degree</div></div>
+        <div class="step-line" id="sl1"></div>
+        <div class="step-wrap"><div class="step-bubble" id="sb2">2</div><div class="step-label">Role</div></div>
+        <div class="step-line" id="sl2"></div>
+        <div class="step-wrap"><div class="step-bubble" id="sb3">3</div><div class="step-label">Upload</div></div>
+        <div class="step-line" id="sl3"></div>
+        <div class="step-wrap"><div class="step-bubble" id="sb4">4</div><div class="step-label">Results</div></div>
+      </div>
+    </div>
+
+    <!-- PANEL 1 -->
+    <div class="panel active" id="panel1">
+      <div class="section-label">Step 1 — Select Your Degree</div>
+      <div class="degree-grid">
+        <div class="degree-card" onclick="selectDegree(this,'B.Tech / B.E / M.Tech')"><div class="deg-icon">💻</div><div><div class="deg-name">B.Tech / B.E</div><div class="deg-sub">M.Tech / BE</div></div></div>
+        <div class="degree-card" onclick="selectDegree(this,'B.Com / M.Com')"><div class="deg-icon">📊</div><div><div class="deg-name">B.Com / M.Com</div><div class="deg-sub">Commerce</div></div></div>
+        <div class="degree-card" onclick="selectDegree(this,'B.Sc / M.Sc')"><div class="deg-icon">🔬</div><div><div class="deg-name">B.Sc / M.Sc</div><div class="deg-sub">Science</div></div></div>
+        <div class="degree-card" onclick="selectDegree(this,'BA LLB / LLM')"><div class="deg-icon">⚖️</div><div><div class="deg-name">BA LLB / LLM</div><div class="deg-sub">Law</div></div></div>
+        <div class="degree-card" onclick="selectDegree(this,'B.Pharmacy / M.Pharmacy')"><div class="deg-icon">💊</div><div><div class="deg-name">B.Pharmacy</div><div class="deg-sub">Pharm.D / M.Pharm</div></div></div>
+        <div class="degree-card" onclick="selectDegree(this,'MBBS / BDS / BAMS')"><div class="deg-icon">🏥</div><div><div class="deg-name">MBBS / BDS</div><div class="deg-sub">BAMS / BHMS</div></div></div>
+        <div class="degree-card" onclick="selectDegree(this,'Civil / Mech / Electrical')"><div class="deg-icon">🏗️</div><div><div class="deg-name">Civil / Mech</div><div class="deg-sub">Electrical Engg</div></div></div>
+        <div class="degree-card" onclick="selectDegree(this,'BBA / MBA')"><div class="deg-icon">🎯</div><div><div class="deg-name">BBA / MBA</div><div class="deg-sub">Management</div></div></div>
+        <div class="degree-card" onclick="selectDegree(this,'B.Ed / M.Ed')"><div class="deg-icon">🎓</div><div><div class="deg-name">B.Ed / M.Ed</div><div class="deg-sub">Education</div></div></div>
+        <div class="degree-card" onclick="selectDegree(this,'Hotel Management')"><div class="deg-icon">🏨</div><div><div class="deg-name">Hotel Mgmt</div><div class="deg-sub">BHM / Hospitality</div></div></div>
+      </div>
+      <button class="btn-primary" id="btn1" disabled onclick="goTo(2)">Continue →</button>
+    </div>
+
+    <!-- PANEL 2 -->
+    <div class="panel" id="panel2">
+      <button class="back-btn" onclick="goTo(1)">← Back</button>
+      <div class="section-label">Step 2 — What Role Are You Targeting?</div>
+      <div class="selected-banner">🎓 Degree: <span class="chip" id="degreeChip"></span></div>
+      <div class="role-grid" id="roleGrid"></div>
+      <button class="btn-primary" id="btn2" disabled onclick="goTo(3)">Continue →</button>
+      <button class="btn-ghost" onclick="goTo(1)">← Change Degree</button>
+    </div>
+
+    <!-- PANEL 3 -->
+    <div class="panel" id="panel3">
+      <button class="back-btn" onclick="goTo(2)">← Back</button>
+      <div class="section-label">Step 3 — Upload Your Resume</div>
+      <div class="selected-banner">🎯 Target Role: <span class="chip" id="roleChip"></span></div>
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept=".pdf,.txt" onchange="handleFile(event)"/>
+        <div class="upload-icon-big">📄</div>
+        <div class="upload-title">Drop your resume here</div>
+        <div class="upload-sub">or click to browse files</div>
+        <div class="format-tags"><span class="ftag">PDF</span><span class="ftag">TXT</span><span class="ftag">Max 10MB</span></div>
+      </div>
+      <div class="file-ok" id="fileOk">
+        <span style="font-size:28px">📋</span>
+        <div><div class="file-ok-name" id="fileOkName"></div><div class="file-ok-size" id="fileOkSize"></div></div>
+      </div>
+      <button class="btn-primary" id="btn3" disabled onclick="startAnalysis()">🚀 Analyze My Resume</button>
+      <button class="btn-ghost" onclick="goTo(2)">← Change Role</button>
+    </div>
+
+    <!-- LOADING -->
+    <div class="loading-screen" id="loadingScreen">
+      <div class="scan-anim"><div class="scan-ring"></div><div class="scan-spin"></div><div class="scan-inner">🤖</div></div>
+      <div class="load-title">Analyzing your resume...</div>
+      <div class="load-sub">CareerLens AI is working</div>
+      <div class="load-steps">
+        <div class="lstep" id="ls1"><div class="lstep-dot"></div>Extracting resume content</div>
+        <div class="lstep" id="ls2"><div class="lstep-dot"></div>Scoring for your target role</div>
+        <div class="lstep" id="ls3"><div class="lstep-dot"></div>Finding issues and improvements</div>
+        <div class="lstep" id="ls4"><div class="lstep-dot"></div>Fetching live job matches</div>
+      </div>
+    </div>
+
+    <!-- PANEL 4 -->
+    <div class="panel" id="panel4">
+      <button class="back-btn" onclick="resetAll()">← Analyze Another Resume</button>
+      <div class="score-hero">
+        <div class="score-ring">
+          <svg viewBox="0 0 160 160">
+            <circle class="ring-bg" cx="80" cy="80" r="70"/>
+            <circle class="ring-fill" id="ringFill" cx="80" cy="80" r="70" stroke="#c8f135" stroke-dasharray="439.82" stroke-dashoffset="439.82"/>
+          </svg>
+          <div class="ring-num"><div class="num" id="scoreNum">0</div><div class="den">/ 100</div></div>
+        </div>
+        <div class="grade-tag" id="gradeBadge">—</div>
+        <p class="score-summary" id="scoreSummary"></p>
+        <div class="mini-stats">
+          <div class="mini-stat"><div class="val" id="statIssues" style="color:var(--pink)">0</div><div class="lbl">Issues Found</div></div>
+          <div class="mini-stat"><div class="val" id="statStrengths" style="color:var(--lime)">0</div><div class="lbl">Strengths</div></div>
+          <div class="mini-stat"><div class="val" id="statInterview" style="color:var(--blue)">—</div><div class="lbl">Interview Chance</div></div>
+          <div class="mini-stat"><div class="val" id="statJobs" style="color:var(--purple)">0</div><div class="lbl">Jobs Found</div></div>
+        </div>
+      </div>
+      <div class="res-card"><div class="res-title"><span>📊</span> Section Scores</div><div id="sectionScores"></div></div>
+      <div class="res-card"><div class="res-title"><span>✅</span> Your Strengths</div><div class="tag-wrap" id="strengthsList"></div></div>
+      <div class="res-card"><div class="res-title"><span>⚠️</span> Issues To Fix</div><div id="issuesList"></div></div>
+      <div class="res-card"><div class="res-title"><span>🪜</span> Step by Step Plan</div><div id="stepsList"></div></div>
+      <div class="two-col">
+        <div class="res-card"><div class="res-title"><span>🔑</span> Add These Keywords</div><div class="tag-wrap" id="keywordList"></div></div>
+        <div class="res-card"><div class="res-title"><span>❌</span> Missing Sections</div><div class="tag-wrap" id="missingList"></div></div>
+      </div>
+      <div class="res-card"><div class="res-title"><span>💼</span> Live Job Matches</div><div id="jobsList"></div></div>
+    </div>
+
+  </div><!-- wrap ends -->
+
+<script>
+const rolesData = {
+  'B.Tech / B.E / M.Tech': [{icon:'💻',name:'Frontend Developer'},{icon:'⚙️',name:'Backend Developer'},{icon:'🌐',name:'Full Stack Developer'},{icon:'📱',name:'Mobile App Developer'},{icon:'🔄',name:'DevOps Engineer'},{icon:'☁️',name:'Cloud Engineer'},{icon:'📊',name:'Data Analyst'},{icon:'🤖',name:'ML / AI Engineer'},{icon:'🔐',name:'Cybersecurity Analyst'},{icon:'🏗️',name:'Embedded Systems'}],
+  'B.Com / M.Com': [{icon:'🧾',name:'Accountant'},{icon:'💰',name:'Financial Analyst'},{icon:'🏦',name:'Bank PO'},{icon:'📈',name:'Investment Analyst'},{icon:'📋',name:'Audit Associate'},{icon:'📦',name:'Operations Executive'}],
+  'B.Sc / M.Sc': [{icon:'🔬',name:'Research Analyst'},{icon:'🧪',name:'Lab Technician'},{icon:'📊',name:'Data Analyst'},{icon:'🌿',name:'Environmental Analyst'},{icon:'🎓',name:'College Lecturer'},{icon:'💊',name:'Quality Control'}],
+  'BA LLB / LLM': [{icon:'⚖️',name:'Corporate Lawyer'},{icon:'📜',name:'Litigation Lawyer'},{icon:'🏛️',name:'Legal Advisor'},{icon:'✅',name:'Compliance Officer'},{icon:'🏗️',name:'Contract Manager'},{icon:'🎯',name:'IP Attorney'}],
+  'B.Pharmacy / M.Pharmacy': [{icon:'💊',name:'Medical Representative'},{icon:'🔬',name:'Research Scientist'},{icon:'📋',name:'Regulatory Affairs'},{icon:'🏥',name:'Hospital Pharmacist'},{icon:'🧪',name:'Quality Assurance'},{icon:'📊',name:'Pharmacovigilance'}],
+  'MBBS / BDS / BAMS': [{icon:'👨‍⚕️',name:'General Physician'},{icon:'🦷',name:'Dentist'},{icon:'🌿',name:'Ayurvedic Doctor'},{icon:'🏥',name:'Medical Officer'},{icon:'📝',name:'Medical Writer'},{icon:'🔬',name:'Clinical Researcher'}],
+  'Civil / Mech / Electrical': [{icon:'🏗️',name:'Site Engineer'},{icon:'⚙️',name:'Design Engineer'},{icon:'🔧',name:'Production Engineer'},{icon:'⚡',name:'Electrical Engineer'},{icon:'🚂',name:'Railways Engineer'},{icon:'📐',name:'Project Engineer'}],
+  'BBA / MBA': [{icon:'📢',name:'Digital Marketing'},{icon:'🤝',name:'Business Development'},{icon:'👥',name:'HR Executive'},{icon:'🛒',name:'Sales Executive'},{icon:'📦',name:'Product Manager'},{icon:'🏭',name:'Operations Manager'}],
+  'B.Ed / M.Ed': [{icon:'📚',name:'School Teacher'},{icon:'🖥️',name:'Online Tutor'},{icon:'✏️',name:'Curriculum Designer'},{icon:'🎓',name:'Special Educator'},{icon:'🏫',name:'School Principal'},{icon:'📱',name:'EdTech Content'}],
+  'Hotel Management': [{icon:'🏨',name:'Hotel Manager'},{icon:'🍽️',name:'F&B Manager'},{icon:'✈️',name:'Travel Consultant'},{icon:'🎪',name:'Event Coordinator'},{icon:'🛎️',name:'Front Office Exec'},{icon:'🗺️',name:'Tour Manager'}],
+};
+
+let selectedDegree='', selectedRole='', selectedFile=null;
+
+function selectDegree(el,name){
+  document.querySelectorAll('.degree-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedDegree=name;
+  document.getElementById('btn1').disabled=false;
+}
+
+function selectRole(el,name){
+  document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedRole=name;
+  document.getElementById('btn2').disabled=false;
+}
+
+function handleFile(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  selectedFile=file;
+  document.getElementById('fileOkName').textContent=file.name;
+  document.getElementById('fileOkSize').textContent=(file.size/1024).toFixed(1)+' KB';
+  document.getElementById('fileOk').classList.add('show');
+  document.getElementById('btn3').disabled=false;
+}
+
+function goTo(step){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('loadingScreen').classList.remove('show');
+  if(step===2){
+    const grid=document.getElementById('roleGrid');
+    grid.innerHTML='';
+    const list=rolesData[selectedDegree]||[];
+    list.forEach(r=>{
+      grid.innerHTML+=`<div class="role-card" onclick="selectRole(this,'${r.name}')"><div class="role-icon">${r.icon}</div><div class="role-name">${r.name}</div></div>`;
+    });
+    grid.innerHTML+=`<div class="role-card" onclick="selectRole(this,'Other')"><div class="role-icon">✏️</div><div class="role-name">Other / Custom</div></div>`;
+    document.getElementById('degreeChip').textContent=selectedDegree;
+    document.getElementById('btn2').disabled=true;
+  }
+  if(step===3) document.getElementById('roleChip').textContent=selectedRole;
+  for(let i=1;i<=4;i++){
+    const b=document.getElementById('sb'+i);
+    const l=document.getElementById('sl'+i);
+    b.classList.remove('active','done');
+    if(l)l.classList.remove('done');
+    if(i<step){b.classList.add('done');if(l)l.classList.add('done');}
+    if(i===step)b.classList.add('active');
+  }
+  if(step<=4)document.getElementById('panel'+step).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resetAll(){
+  selectedDegree='';selectedRole='';selectedFile=null;
+  document.getElementById('fileInput').value='';
+  document.getElementById('fileOk').classList.remove('show');
+  document.getElementById('btn3').disabled=true;
+  goTo(1);
+}
+
+async function startAnalysis(){
+  if(!selectedFile){alert('Please upload a resume first!');return;}
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('loadingScreen').classList.add('show');
+  const steps=['ls1','ls2','ls3','ls4'];
+  steps.forEach(s=>document.getElementById(s).classList.remove('active'));
+  document.getElementById('ls1').classList.add('active');
+  let i=0;
+  const iv=setInterval(()=>{
+    i++;
+    if(i<steps.length)document.getElementById(steps[i]).classList.add('active');
+    if(i>=steps.length-1)clearInterval(iv);
+  },1500);
+  const formData=new FormData();
+  formData.append('resume',selectedFile);
+  formData.append('target_role',selectedRole);
+  formData.append('degree',selectedDegree);
+  try{
+    const response=await fetch('/api/analyze',{method:'POST',body:formData});
+    const data=await response.json();
+    clearInterval(iv);
+    if(!response.ok||!data.success){
+      document.getElementById('loadingScreen').classList.remove('show');
+      document.getElementById('panel3').classList.add('active');
+      alert('Error: '+(data.error||'Something went wrong'));
+      return;
+    }
+    renderResults(data);
+  }catch(error){
+    clearInterval(iv);
+    document.getElementById('loadingScreen').classList.remove('show');
+    document.getElementById('panel3').classList.add('active');
+    alert('Network error. Is the server running?');
+  }
+}
+
+function getColor(score){
+  if(score>=80)return'#c8f135';
+  if(score>=60)return'#4f8eff';
+  if(score>=40)return'#ffb432';
+  return'#ff5f8d';
+}
+
+function renderResults(data){
+  const a=data.analysis;
+  const jobs=data.jobs||[];
+  const color=getColor(a.overall_score);
+  const arc=document.getElementById('ringFill');
+  arc.style.stroke=color;
+  setTimeout(()=>{arc.style.strokeDashoffset=439.82-(a.overall_score/100)*439.82;},100);
+  let count=0;
+  const numEl=document.getElementById('scoreNum');
+  numEl.style.color=color;
+  const counter=setInterval(()=>{
+    count=Math.min(count+2,a.overall_score);
+    numEl.textContent=count;
+    if(count>=a.overall_score)clearInterval(counter);
+  },20);
+  document.getElementById('gradeBadge').textContent='Grade: '+a.grade;
+  document.getElementById('scoreSummary').textContent=a.summary;
+  document.getElementById('statIssues').textContent=a.critical_issues.length;
+  document.getElementById('statStrengths').textContent=a.strengths.length;
+  document.getElementById('statInterview').textContent=a.estimated_interview_chance||'—';
+  document.getElementById('statJobs').textContent=jobs.length;
+  const sectionMap={contact_info:{label:'Contact Info',max:10},professional_summary:{label:'Professional Summary',max:10},work_experience:{label:'Work Experience',max:25},education:{label:'Education',max:15},skills:{label:'Skills',max:20},formatting_readability:{label:'Formatting',max:15},keywords_ats:{label:'Keywords & ATS',max:15}};
+  const scoresEl=document.getElementById('sectionScores');
+  scoresEl.innerHTML='';
+  for(const[key,info]of Object.entries(sectionMap)){
+    const sec=a.section_scores[key];
+    if(!sec)continue;
+    const pct=Math.round((sec.score/info.max)*100);
+    const c=getColor(pct);
+    scoresEl.innerHTML+=`<div class="bar-item"><div class="bar-head"><span class="bar-name">${info.label}</span><span class="bar-val" style="color:${c}">${sec.score}/${info.max}</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:${c}" data-pct="${pct}"></div></div><div class="bar-fb">${sec.feedback}</div></div>`;
+  }
+  setTimeout(()=>{document.querySelectorAll('.bar-fill').forEach(el=>{el.style.width=el.dataset.pct+'%';});},200);
+  document.getElementById('strengthsList').innerHTML=a.strengths.map(s=>`<span class="tag tag-green">✓ ${s}</span>`).join('');
+  const issuesEl=document.getElementById('issuesList');
+  issuesEl.innerHTML=a.critical_issues.length===0?'<p style="color:var(--lime)">🎉 No critical issues found!</p>':a.critical_issues.map(i=>`<div class="issue ${i.severity}"><div class="issue-head"><span class="sev">${i.severity}</span><span class="issue-title">${i.issue}</span></div><div class="issue-desc">${i.description}</div><div class="fix-box">💡 ${i.fix}</div></div>`).join('');
+  document.getElementById('stepsList').innerHTML=a.step_by_step_improvements.map(s=>`<div class="step-row"><div class="step-num">${s.step}</div><div><div class="step-area">${s.area}</div><div class="step-prob">⚠️ ${s.current_problem}</div><div class="step-action">→ ${s.action}</div>${s.example?`<div class="step-example">e.g. ${s.example}</div>`:''}</div></div>`).join('');
+  document.getElementById('keywordList').innerHTML=(a.keyword_suggestions||[]).map(k=>`<span class="tag tag-blue">${k}</span>`).join('');
+  document.getElementById('missingList').innerHTML=(a.missing_sections||[]).length===0?'<span style="color:var(--lime);font-size:13px">None missing ✓</span>':a.missing_sections.map(m=>`<span class="tag tag-pink">${m}</span>`).join('');
+  const jobsEl=document.getElementById('jobsList');
+  jobsEl.innerHTML=jobs.length===0?'<p style="color:var(--muted)">No jobs found. Try again later.</p>':jobs.map(job=>`<div class="job-card"><div class="job-logo">💼</div><div class="job-info"><div class="job-title">${job.title}</div><div class="job-company">${job.company} · ${job.location}</div><div class="job-tags"><span class="jtag">${job.employment_type||'Full Time'}</span></div></div><div class="job-right"><div class="job-salary">${job.salary}</div><a class="job-apply" href="${job.apply_link}" target="_blank">Apply Now →</a></div></div>`).join('');
+  document.getElementById('loadingScreen').classList.remove('show');
+  goTo(4);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+const dropZone=document.getElementById('dropZone');
+if(dropZone){
+  dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.style.borderColor='#c8f135';});
+  dropZone.addEventListener('dragleave',()=>{dropZone.style.borderColor='';});
+  dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.style.borderColor='';const file=e.dataTransfer.files[0];if(file)handleFile({target:{files:[file]}});});
+}
+</script>
+</body>
+</html>
