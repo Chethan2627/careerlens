@@ -19,11 +19,84 @@
     .blob { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
     .blob-1 { width: 500px; height: 500px; background: rgba(200,241,53,0.06); top: -150px; right: -100px; }
     .blob-2 { width: 400px; height: 400px; background: rgba(79,142,255,0.07); bottom: -100px; left: -100px; }
+
+    /* ── LOGIN SCREEN ── */
+    #loginScreen {
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--ink);
+    }
+    .login-box {
+      background: var(--ink2); border: 1px solid var(--line);
+      border-radius: 28px; padding: 48px 40px; width: 100%; max-width: 420px;
+      text-align: center; position: relative; z-index: 1;
+    }
+    .login-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 28px; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 8px; }
+    .login-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 12px var(--lime); animation: blink 2s infinite; }
+    .login-tagline { color: var(--muted); font-size: 14px; margin-bottom: 40px; }
+    .login-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .login-sub { color: var(--muted); font-size: 13px; margin-bottom: 32px; line-height: 1.6; }
+    .btn-google {
+      width: 100%; padding: 16px; background: white; border: none;
+      border-radius: 14px; color: #1a1a1a; font-family: 'Syne', sans-serif;
+      font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      margin-bottom: 16px;
+    }
+    .btn-google:hover { background: #f0f0f0; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,255,255,0.15); }
+    .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+    .divider-line { flex: 1; height: 1px; background: var(--line); }
+    .divider-text { color: var(--muted2); font-size: 12px; letter-spacing: 1px; }
+    .phone-input-wrap { position: relative; margin-bottom: 12px; }
+    .phone-input {
+      width: 100%; padding: 16px 20px; background: var(--ink3);
+      border: 1px solid var(--line); border-radius: 14px; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 15px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .phone-input:focus { border-color: rgba(200,241,53,0.4); }
+    .phone-input::placeholder { color: var(--muted2); }
+    .btn-phone {
+      width: 100%; padding: 16px; background: rgba(200,241,53,0.1);
+      border: 1px solid rgba(200,241,53,0.25); border-radius: 14px;
+      color: var(--lime); font-family: 'Syne', sans-serif; font-size: 15px;
+      font-weight: 700; cursor: pointer; transition: all 0.3s; margin-bottom: 12px;
+    }
+    .btn-phone:hover:not(:disabled) { background: rgba(200,241,53,0.2); transform: translateY(-2px); }
+    .btn-phone:disabled { opacity: 0.4; cursor: not-allowed; }
+    .otp-section { display: none; }
+    .otp-section.show { display: block; }
+    .otp-label { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+    .otp-inputs { display: flex; gap: 10px; justify-content: center; margin-bottom: 16px; }
+    .otp-input {
+      width: 50px; height: 56px; text-align: center; font-size: 22px;
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      background: var(--ink3); border: 1px solid var(--line);
+      border-radius: 12px; color: var(--text); outline: none; transition: border-color 0.2s;
+    }
+    .otp-input:focus { border-color: var(--lime); }
+    .login-error { background: rgba(255,95,141,0.1); border: 1px solid rgba(255,95,141,0.2); border-radius: 10px; padding: 12px; font-size: 13px; color: var(--pink); margin-bottom: 12px; display: none; }
+    .login-error.show { display: block; }
+    .login-loading { color: var(--muted); font-size: 13px; margin-top: 12px; display: none; }
+    .login-loading.show { display: block; }
+    #recaptcha-container { margin: 12px 0; display: flex; justify-content: center; }
+
+    /* ── MAIN APP ── */
+    #mainApp { display: none; }
+    #mainApp.show { display: block; }
     .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
-    nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 64px; background: rgba(10,10,15,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--line); }
+    nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 64px; background: rgba(10,10,15,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--line); position: relative; }
     .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px; display: flex; align-items: center; gap: 8px; }
     .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 10px var(--lime); animation: blink 2s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .nav-center { position: absolute; left: 50%; transform: translateX(-50%); font-size: 12px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .nav-user { display: flex; align-items: center; gap: 10px; }
+    .nav-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--lime); object-fit: cover; }
+    .nav-avatar-placeholder { width: 32px; height: 32px; border-radius: 50%; background: rgba(200,241,53,0.2); border: 2px solid var(--lime); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .nav-name { font-size: 13px; font-weight: 500; color: var(--text); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .btn-logout { background: rgba(255,95,141,0.1); border: 1px solid rgba(255,95,141,0.2); border-radius: 8px; padding: 6px 14px; font-size: 12px; color: var(--pink); cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+    .btn-logout:hover { background: rgba(255,95,141,0.2); }
     .nav-pill { background: rgba(200,241,53,0.1); border: 1px solid rgba(200,241,53,0.2); border-radius: 100px; padding: 6px 16px; font-size: 12px; color: var(--lime); letter-spacing: 1px; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
     @keyframes spin { to{transform:rotate(360deg)} }
@@ -153,295 +226,343 @@
     .job-salary { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--lime); margin-bottom: 6px; }
     .job-apply { font-size: 12px; color: var(--blue); text-decoration: none; }
     .job-apply:hover { text-decoration: underline; }
-    @media(max-width:768px) { nav{padding:0 20px} .wrap{padding:0 16px} h1{letter-spacing:-1px} .mini-stats{grid-template-columns:1fr 1fr} .two-col{grid-template-columns:1fr} .degree-grid{grid-template-columns:1fr 1fr} }
+    @media(max-width:768px) { nav{padding:0 20px} .wrap{padding:0 16px} h1{letter-spacing:-1px} .mini-stats{grid-template-columns:1fr 1fr} .two-col{grid-template-columns:1fr} .degree-grid{grid-template-columns:1fr 1fr} .login-box{padding:32px 24px;margin:16px;} }
   </style>
 </head>
 <body>
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
-  <nav>
-    <div class="nav-logo"><div class="nav-dot"></div>CareerLens</div>
-    <div class="nav-pill">🇮🇳 India Jobs</div>
-  </nav>
-  <div class="wrap">
-    <div class="hero">
-      <div class="hero-tag">✦ <span>AI Powered</span> Resume Intelligence</div>
-      <h1>Score your resume.<br/><span class="h1-accent">Land your dream job.</span></h1>
-      <p class="hero-sub">Upload your resume, pick your target role, and get an AI-powered score, fix plan, and live job matches — built for Indian job seekers.</p>
-      <div class="steps-bar">
-        <div class="step-wrap"><div class="step-bubble active" id="sb1">1</div><div class="step-label">Degree</div></div>
-        <div class="step-line" id="sl1"></div>
-        <div class="step-wrap"><div class="step-bubble" id="sb2">2</div><div class="step-label">Role</div></div>
-        <div class="step-line" id="sl2"></div>
-        <div class="step-wrap"><div class="step-bubble" id="sb3">3</div><div class="step-label">Upload</div></div>
-        <div class="step-line" id="sl3"></div>
-        <div class="step-wrap"><div class="step-bubble" id="sb4">4</div><div class="step-label">Results</div></div>
+
+  <!-- ── LOGIN SCREEN ── -->
+  <div id="loginScreen">
+    <div class="login-box">
+      <div class="login-logo"><div class="login-dot"></div>CareerLens</div>
+      <div class="login-tagline">AI-Powered Resume Intelligence 🇮🇳</div>
+      <div class="login-title">Welcome Back!</div>
+      <div class="login-sub">Sign in to score your resume and get live job matches.</div>
+
+      <div class="login-error" id="loginError"></div>
+      <div class="login-loading" id="loginLoading">⏳ Signing you in...</div>
+
+      <!-- Google -->
+      <button class="btn-google" onclick="signInWithGoogle()">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Continue with Google
+      </button>
+
+      <div style="margin-top:24px;padding:16px;background:rgba(200,241,53,0.05);border:1px solid rgba(200,241,53,0.1);border-radius:12px;">
+        <p style="font-size:12px;color:var(--muted);line-height:1.6;">📱 <strong style="color:var(--lime)">Phone login coming soon!</strong><br/>Firebase phone auth requires billing for Indian numbers. Google login works perfectly for now.</p>
       </div>
     </div>
+  </div>
 
-    <!-- PANEL 1 -->
-    <div class="panel active" id="panel1">
-      <div class="section-label">Step 1 — Select Your Degree</div>
-      <div class="degree-grid">
-        <div class="degree-card" onclick="selectDegree(this,'B.Tech / B.E / M.Tech')"><div class="deg-icon">💻</div><div><div class="deg-name">B.Tech / B.E</div><div class="deg-sub">M.Tech / BE</div></div></div>
-        <div class="degree-card" onclick="selectDegree(this,'B.Com / M.Com')"><div class="deg-icon">📊</div><div><div class="deg-name">B.Com / M.Com</div><div class="deg-sub">Commerce</div></div></div>
-        <div class="degree-card" onclick="selectDegree(this,'B.Sc / M.Sc')"><div class="deg-icon">🔬</div><div><div class="deg-name">B.Sc / M.Sc</div><div class="deg-sub">Science</div></div></div>
-        <div class="degree-card" onclick="selectDegree(this,'BA LLB / LLM')"><div class="deg-icon">⚖️</div><div><div class="deg-name">BA LLB / LLM</div><div class="deg-sub">Law</div></div></div>
-        <div class="degree-card" onclick="selectDegree(this,'B.Pharmacy / M.Pharmacy')"><div class="deg-icon">💊</div><div><div class="deg-name">B.Pharmacy</div><div class="deg-sub">Pharm.D / M.Pharm</div></div></div>
-        <div class="degree-card" onclick="selectDegree(this,'MBBS / BDS / BAMS')"><div class="deg-icon">🏥</div><div><div class="deg-name">MBBS / BDS</div><div class="deg-sub">BAMS / BHMS</div></div></div>
-        <div class="degree-card" onclick="selectDegree(this,'Civil / Mech / Electrical')"><div class="deg-icon">🏗️</div><div><div class="deg-name">Civil / Mech</div><div class="deg-sub">Electrical Engg</div></div></div>
-        <div class="degree-card" onclick="selectDegree(this,'BBA / MBA')"><div class="deg-icon">🎯</div><div><div class="deg-name">BBA / MBA</div><div class="deg-sub">Management</div></div></div>
-        <div class="degree-card" onclick="selectDegree(this,'B.Ed / M.Ed')"><div class="deg-icon">🎓</div><div><div class="deg-name">B.Ed / M.Ed</div><div class="deg-sub">Education</div></div></div>
-        <div class="degree-card" onclick="selectDegree(this,'Hotel Management')"><div class="deg-icon">🏨</div><div><div class="deg-name">Hotel Mgmt</div><div class="deg-sub">BHM / Hospitality</div></div></div>
-      </div>
-      <button class="btn-primary" id="btn1" disabled onclick="goTo(2)">Continue →</button>
-    </div>
-
-    <!-- PANEL 2 -->
-    <div class="panel" id="panel2">
-      <button class="back-btn" onclick="goTo(1)">← Back</button>
-      <div class="section-label">Step 2 — What Role Are You Targeting?</div>
-      <div class="selected-banner">🎓 Degree: <span class="chip" id="degreeChip"></span></div>
-      <div class="role-grid" id="roleGrid"></div>
-      <button class="btn-primary" id="btn2" disabled onclick="goTo(3)">Continue →</button>
-      <button class="btn-ghost" onclick="goTo(1)">← Change Degree</button>
-    </div>
-
-    <!-- PANEL 3 -->
-    <div class="panel" id="panel3">
-      <button class="back-btn" onclick="goTo(2)">← Back</button>
-      <div class="section-label">Step 3 — Upload Your Resume</div>
-      <div class="selected-banner">🎯 Target Role: <span class="chip" id="roleChip"></span></div>
-      <div class="drop-zone" id="dropZone">
-        <input type="file" id="fileInput" accept=".pdf,.txt" onchange="handleFile(event)"/>
-        <div class="upload-icon-big">📄</div>
-        <div class="upload-title">Drop your resume here</div>
-        <div class="upload-sub">or click to browse files</div>
-        <div class="format-tags"><span class="ftag">PDF</span><span class="ftag">TXT</span><span class="ftag">Max 10MB</span></div>
-      </div>
-      <div class="file-ok" id="fileOk">
-        <span style="font-size:28px">📋</span>
-        <div><div class="file-ok-name" id="fileOkName"></div><div class="file-ok-size" id="fileOkSize"></div></div>
-      </div>
-      <button class="btn-primary" id="btn3" disabled onclick="startAnalysis()">🚀 Analyze My Resume</button>
-      <button class="btn-ghost" onclick="goTo(2)">← Change Role</button>
-    </div>
-
-    <!-- LOADING -->
-    <div class="loading-screen" id="loadingScreen">
-      <div class="scan-anim"><div class="scan-ring"></div><div class="scan-spin"></div><div class="scan-inner">🤖</div></div>
-      <div class="load-title">Analyzing your resume...</div>
-      <div class="load-sub">CareerLens AI is working</div>
-      <div class="load-steps">
-        <div class="lstep" id="ls1"><div class="lstep-dot"></div>Extracting resume content</div>
-        <div class="lstep" id="ls2"><div class="lstep-dot"></div>Scoring for your target role</div>
-        <div class="lstep" id="ls3"><div class="lstep-dot"></div>Finding issues and improvements</div>
-        <div class="lstep" id="ls4"><div class="lstep-dot"></div>Fetching live job matches</div>
-      </div>
-    </div>
-
-    <!-- PANEL 4 -->
-    <div class="panel" id="panel4">
-      <button class="back-btn" onclick="resetAll()">← Analyze Another Resume</button>
-      <div class="score-hero">
-        <div class="score-ring">
-          <svg viewBox="0 0 160 160">
-            <circle class="ring-bg" cx="80" cy="80" r="70"/>
-            <circle class="ring-fill" id="ringFill" cx="80" cy="80" r="70" stroke="#c8f135" stroke-dasharray="439.82" stroke-dashoffset="439.82"/>
-          </svg>
-          <div class="ring-num"><div class="num" id="scoreNum">0</div><div class="den">/ 100</div></div>
+  <!-- ── MAIN APP ── -->
+  <div id="mainApp">
+    <nav>
+      <div class="nav-logo"><div class="nav-dot"></div>CareerLens</div>
+      <div class="nav-center">⚡ Built by Chethan M S · 🤝 CoWork @ Anthropic</div>
+      <div class="nav-right">
+        <div class="nav-user">
+          <div class="nav-avatar-placeholder" id="navAvatar">👤</div>
+          <span class="nav-name" id="navName">User</span>
         </div>
-        <div class="grade-tag" id="gradeBadge">—</div>
-        <p class="score-summary" id="scoreSummary"></p>
-        <div class="mini-stats">
-          <div class="mini-stat"><div class="val" id="statIssues" style="color:var(--pink)">0</div><div class="lbl">Issues Found</div></div>
-          <div class="mini-stat"><div class="val" id="statStrengths" style="color:var(--lime)">0</div><div class="lbl">Strengths</div></div>
-          <div class="mini-stat"><div class="val" id="statInterview" style="color:var(--blue)">—</div><div class="lbl">Interview Chance</div></div>
-          <div class="mini-stat"><div class="val" id="statJobs" style="color:var(--purple)">0</div><div class="lbl">Jobs Found</div></div>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+        <div class="nav-pill">🇮🇳 India Jobs</div>
+      </div>
+    </nav>
+
+    <div class="wrap">
+      <div class="hero">
+        <div class="hero-tag">✦ <span>AI Powered</span> Resume Intelligence</div>
+        <h1>Score your resume.<br/><span class="h1-accent">Land your dream job.</span></h1>
+        <p class="hero-sub">Upload your resume, pick your target role, and get an AI-powered score, fix plan, and live job matches — built for Indian job seekers.</p>
+        <div class="steps-bar">
+          <div class="step-wrap"><div class="step-bubble active" id="sb1">1</div><div class="step-label">Degree</div></div>
+          <div class="step-line" id="sl1"></div>
+          <div class="step-wrap"><div class="step-bubble" id="sb2">2</div><div class="step-label">Role</div></div>
+          <div class="step-line" id="sl2"></div>
+          <div class="step-wrap"><div class="step-bubble" id="sb3">3</div><div class="step-label">Upload</div></div>
+          <div class="step-line" id="sl3"></div>
+          <div class="step-wrap"><div class="step-bubble" id="sb4">4</div><div class="step-label">Results</div></div>
         </div>
       </div>
-      <div class="res-card"><div class="res-title"><span>📊</span> Section Scores</div><div id="sectionScores"></div></div>
-      <div class="res-card"><div class="res-title"><span>✅</span> Your Strengths</div><div class="tag-wrap" id="strengthsList"></div></div>
-      <div class="res-card"><div class="res-title"><span>⚠️</span> Issues To Fix</div><div id="issuesList"></div></div>
-      <div class="res-card"><div class="res-title"><span>🪜</span> Step by Step Plan</div><div id="stepsList"></div></div>
-      <div class="two-col">
-        <div class="res-card"><div class="res-title"><span>🔑</span> Add These Keywords</div><div class="tag-wrap" id="keywordList"></div></div>
-        <div class="res-card"><div class="res-title"><span>❌</span> Missing Sections</div><div class="tag-wrap" id="missingList"></div></div>
+
+      <!-- PANEL 1 -->
+      <div class="panel active" id="panel1">
+        <div class="section-label">Step 1 — Select Your Degree</div>
+        <div class="degree-grid">
+          <div class="degree-card" onclick="selectDegree(this,'B.Tech / B.E / M.Tech')"><div class="deg-icon">💻</div><div><div class="deg-name">B.Tech / B.E</div><div class="deg-sub">M.Tech / BE</div></div></div>
+          <div class="degree-card" onclick="selectDegree(this,'B.Com / M.Com')"><div class="deg-icon">📊</div><div><div class="deg-name">B.Com / M.Com</div><div class="deg-sub">Commerce</div></div></div>
+          <div class="degree-card" onclick="selectDegree(this,'B.Sc / M.Sc')"><div class="deg-icon">🔬</div><div><div class="deg-name">B.Sc / M.Sc</div><div class="deg-sub">Science</div></div></div>
+          <div class="degree-card" onclick="selectDegree(this,'BA LLB / LLM')"><div class="deg-icon">⚖️</div><div><div class="deg-name">BA LLB / LLM</div><div class="deg-sub">Law</div></div></div>
+          <div class="degree-card" onclick="selectDegree(this,'B.Pharmacy / M.Pharmacy')"><div class="deg-icon">💊</div><div><div class="deg-name">B.Pharmacy</div><div class="deg-sub">Pharm.D / M.Pharm</div></div></div>
+          <div class="degree-card" onclick="selectDegree(this,'MBBS / BDS / BAMS')"><div class="deg-icon">🏥</div><div><div class="deg-name">MBBS / BDS</div><div class="deg-sub">BAMS / BHMS</div></div></div>
+          <div class="degree-card" onclick="selectDegree(this,'Civil / Mech / Electrical')"><div class="deg-icon">🏗️</div><div><div class="deg-name">Civil / Mech</div><div class="deg-sub">Electrical Engg</div></div></div>
+          <div class="degree-card" onclick="selectDegree(this,'BBA / MBA')"><div class="deg-icon">🎯</div><div><div class="deg-name">BBA / MBA</div><div class="deg-sub">Management</div></div></div>
+          <div class="degree-card" onclick="selectDegree(this,'B.Ed / M.Ed')"><div class="deg-icon">🎓</div><div><div class="deg-name">B.Ed / M.Ed</div><div class="deg-sub">Education</div></div></div>
+          <div class="degree-card" onclick="selectDegree(this,'Hotel Management')"><div class="deg-icon">🏨</div><div><div class="deg-name">Hotel Mgmt</div><div class="deg-sub">BHM / Hospitality</div></div></div>
+        </div>
+        <button class="btn-primary" id="btn1" disabled onclick="goTo(2)">Continue →</button>
       </div>
-      <div class="res-card"><div class="res-title"><span>💼</span> Live Job Matches</div><div id="jobsList"></div></div>
+
+      <!-- PANEL 2 -->
+      <div class="panel" id="panel2">
+        <button class="back-btn" onclick="goTo(1)">← Back</button>
+        <div class="section-label">Step 2 — What Role Are You Targeting?</div>
+        <div class="selected-banner">🎓 Degree: <span class="chip" id="degreeChip"></span></div>
+        <div class="role-grid" id="roleGrid"></div>
+        <button class="btn-primary" id="btn2" disabled onclick="goTo(3)">Continue →</button>
+        <button class="btn-ghost" onclick="goTo(1)">← Change Degree</button>
+      </div>
+
+      <!-- PANEL 3 -->
+      <div class="panel" id="panel3">
+        <button class="back-btn" onclick="goTo(2)">← Back</button>
+        <div class="section-label">Step 3 — Upload Your Resume</div>
+        <div class="selected-banner">🎯 Target Role: <span class="chip" id="roleChip"></span></div>
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="fileInput" accept=".pdf,.txt" onchange="handleFile(event)"/>
+          <div class="upload-icon-big">📄</div>
+          <div class="upload-title">Drop your resume here</div>
+          <div class="upload-sub">or click to browse files</div>
+          <div class="format-tags"><span class="ftag">PDF</span><span class="ftag">TXT</span><span class="ftag">Max 10MB</span></div>
+        </div>
+        <div class="file-ok" id="fileOk">
+          <span style="font-size:28px">📋</span>
+          <div><div class="file-ok-name" id="fileOkName"></div><div class="file-ok-size" id="fileOkSize"></div></div>
+        </div>
+        <button class="btn-primary" id="btn3" disabled onclick="startAnalysis()">🚀 Analyze My Resume</button>
+        <button class="btn-ghost" onclick="goTo(2)">← Change Role</button>
+      </div>
+
+      <!-- LOADING -->
+      <div class="loading-screen" id="loadingScreen">
+        <div class="scan-anim"><div class="scan-ring"></div><div class="scan-spin"></div><div class="scan-inner">🤖</div></div>
+        <div class="load-title">Analyzing your resume...</div>
+        <div class="load-sub">CareerLens AI is working</div>
+        <div class="load-steps">
+          <div class="lstep" id="ls1"><div class="lstep-dot"></div>Extracting resume content</div>
+          <div class="lstep" id="ls2"><div class="lstep-dot"></div>Scoring for your target role</div>
+          <div class="lstep" id="ls3"><div class="lstep-dot"></div>Finding issues and improvements</div>
+          <div class="lstep" id="ls4"><div class="lstep-dot"></div>Fetching live job matches</div>
+        </div>
+      </div>
+
+      <!-- PANEL 4 -->
+      <div class="panel" id="panel4">
+        <button class="back-btn" onclick="resetAll()">← Analyze Another Resume</button>
+        <div class="score-hero">
+          <div class="score-ring">
+            <svg viewBox="0 0 160 160">
+              <circle class="ring-bg" cx="80" cy="80" r="70"/>
+              <circle class="ring-fill" id="ringFill" cx="80" cy="80" r="70" stroke="#c8f135" stroke-dasharray="439.82" stroke-dashoffset="439.82"/>
+            </svg>
+            <div class="ring-num"><div class="num" id="scoreNum">0</div><div class="den">/ 100</div></div>
+          </div>
+          <div class="grade-tag" id="gradeBadge">—</div>
+          <p class="score-summary" id="scoreSummary"></p>
+          <div class="mini-stats">
+            <div class="mini-stat"><div class="val" id="statIssues" style="color:var(--pink)">0</div><div class="lbl">Issues Found</div></div>
+            <div class="mini-stat"><div class="val" id="statStrengths" style="color:var(--lime)">0</div><div class="lbl">Strengths</div></div>
+            <div class="mini-stat"><div class="val" id="statInterview" style="color:var(--blue)">—</div><div class="lbl">Interview Chance</div></div>
+            <div class="mini-stat"><div class="val" id="statJobs" style="color:var(--purple)">0</div><div class="lbl">Jobs Found</div></div>
+          </div>
+        </div>
+        <div class="res-card"><div class="res-title"><span>📊</span> Section Scores</div><div id="sectionScores"></div></div>
+        <div class="res-card"><div class="res-title"><span>✅</span> Your Strengths</div><div class="tag-wrap" id="strengthsList"></div></div>
+        <div class="res-card"><div class="res-title"><span>⚠️</span> Issues To Fix</div><div id="issuesList"></div></div>
+        <div class="res-card"><div class="res-title"><span>🪜</span> Step by Step Plan</div><div id="stepsList"></div></div>
+        <div class="two-col">
+          <div class="res-card"><div class="res-title"><span>🔑</span> Add These Keywords</div><div class="tag-wrap" id="keywordList"></div></div>
+          <div class="res-card"><div class="res-title"><span>❌</span> Missing Sections</div><div class="tag-wrap" id="missingList"></div></div>
+        </div>
+        <div class="res-card"><div class="res-title"><span>💼</span> Live Job Matches</div><div id="jobsList"></div></div>
+      </div>
     </div>
+  </div>
 
-  </div><!-- wrap ends -->
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-<script>
-const rolesData = {
-  'B.Tech / B.E / M.Tech': [{icon:'💻',name:'Frontend Developer'},{icon:'⚙️',name:'Backend Developer'},{icon:'🌐',name:'Full Stack Developer'},{icon:'📱',name:'Mobile App Developer'},{icon:'🔄',name:'DevOps Engineer'},{icon:'☁️',name:'Cloud Engineer'},{icon:'📊',name:'Data Analyst'},{icon:'🤖',name:'ML / AI Engineer'},{icon:'🔐',name:'Cybersecurity Analyst'},{icon:'🏗️',name:'Embedded Systems'}],
-  'B.Com / M.Com': [{icon:'🧾',name:'Accountant'},{icon:'💰',name:'Financial Analyst'},{icon:'🏦',name:'Bank PO'},{icon:'📈',name:'Investment Analyst'},{icon:'📋',name:'Audit Associate'},{icon:'📦',name:'Operations Executive'}],
-  'B.Sc / M.Sc': [{icon:'🔬',name:'Research Analyst'},{icon:'🧪',name:'Lab Technician'},{icon:'📊',name:'Data Analyst'},{icon:'🌿',name:'Environmental Analyst'},{icon:'🎓',name:'College Lecturer'},{icon:'💊',name:'Quality Control'}],
-  'BA LLB / LLM': [{icon:'⚖️',name:'Corporate Lawyer'},{icon:'📜',name:'Litigation Lawyer'},{icon:'🏛️',name:'Legal Advisor'},{icon:'✅',name:'Compliance Officer'},{icon:'🏗️',name:'Contract Manager'},{icon:'🎯',name:'IP Attorney'}],
-  'B.Pharmacy / M.Pharmacy': [{icon:'💊',name:'Medical Representative'},{icon:'🔬',name:'Research Scientist'},{icon:'📋',name:'Regulatory Affairs'},{icon:'🏥',name:'Hospital Pharmacist'},{icon:'🧪',name:'Quality Assurance'},{icon:'📊',name:'Pharmacovigilance'}],
-  'MBBS / BDS / BAMS': [{icon:'👨‍⚕️',name:'General Physician'},{icon:'🦷',name:'Dentist'},{icon:'🌿',name:'Ayurvedic Doctor'},{icon:'🏥',name:'Medical Officer'},{icon:'📝',name:'Medical Writer'},{icon:'🔬',name:'Clinical Researcher'}],
-  'Civil / Mech / Electrical': [{icon:'🏗️',name:'Site Engineer'},{icon:'⚙️',name:'Design Engineer'},{icon:'🔧',name:'Production Engineer'},{icon:'⚡',name:'Electrical Engineer'},{icon:'🚂',name:'Railways Engineer'},{icon:'📐',name:'Project Engineer'}],
-  'BBA / MBA': [{icon:'📢',name:'Digital Marketing'},{icon:'🤝',name:'Business Development'},{icon:'👥',name:'HR Executive'},{icon:'🛒',name:'Sales Executive'},{icon:'📦',name:'Product Manager'},{icon:'🏭',name:'Operations Manager'}],
-  'B.Ed / M.Ed': [{icon:'📚',name:'School Teacher'},{icon:'🖥️',name:'Online Tutor'},{icon:'✏️',name:'Curriculum Designer'},{icon:'🎓',name:'Special Educator'},{icon:'🏫',name:'School Principal'},{icon:'📱',name:'EdTech Content'}],
-  'Hotel Management': [{icon:'🏨',name:'Hotel Manager'},{icon:'🍽️',name:'F&B Manager'},{icon:'✈️',name:'Travel Consultant'},{icon:'🎪',name:'Event Coordinator'},{icon:'🛎️',name:'Front Office Exec'},{icon:'🗺️',name:'Tour Manager'}],
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6VO04pdMU4PLbcqcVvJ05T6fYnnQ4TGs",
+      authDomain: "careerlens-7e21c.firebaseapp.com",
+      projectId: "careerlens-7e21c",
+      storageBucket: "careerlens-7e21c.firebasestorage.app",
+      messagingSenderId: "829539993037",
+      appId: "1:829539993037:web:f8371971d8a8b41021f084"
+    };
 
-let selectedDegree='', selectedRole='', selectedFile=null;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-function selectDegree(el,name){
-  document.querySelectorAll('.degree-card').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedDegree=name;
-  document.getElementById('btn1').disabled=false;
-}
-
-function selectRole(el,name){
-  document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedRole=name;
-  document.getElementById('btn2').disabled=false;
-}
-
-function handleFile(e){
-  const file=e.target.files[0];
-  if(!file)return;
-  selectedFile=file;
-  document.getElementById('fileOkName').textContent=file.name;
-  document.getElementById('fileOkSize').textContent=(file.size/1024).toFixed(1)+' KB';
-  document.getElementById('fileOk').classList.add('show');
-  document.getElementById('btn3').disabled=false;
-}
-
-function goTo(step){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('loadingScreen').classList.remove('show');
-  if(step===2){
-    const grid=document.getElementById('roleGrid');
-    grid.innerHTML='';
-    const list=rolesData[selectedDegree]||[];
-    list.forEach(r=>{
-      grid.innerHTML+=`<div class="role-card" onclick="selectRole(this,'${r.name}')"><div class="role-icon">${r.icon}</div><div class="role-name">${r.name}</div></div>`;
-    });
-    grid.innerHTML+=`<div class="role-card" onclick="selectRole(this,'Other')"><div class="role-icon">✏️</div><div class="role-name">Other / Custom</div></div>`;
-    document.getElementById('degreeChip').textContent=selectedDegree;
-    document.getElementById('btn2').disabled=true;
-  }
-  if(step===3) document.getElementById('roleChip').textContent=selectedRole;
-  for(let i=1;i<=4;i++){
-    const b=document.getElementById('sb'+i);
-    const l=document.getElementById('sl'+i);
-    b.classList.remove('active','done');
-    if(l)l.classList.remove('done');
-    if(i<step){b.classList.add('done');if(l)l.classList.add('done');}
-    if(i===step)b.classList.add('active');
-  }
-  if(step<=4)document.getElementById('panel'+step).classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function resetAll(){
-  selectedDegree='';selectedRole='';selectedFile=null;
-  document.getElementById('fileInput').value='';
-  document.getElementById('fileOk').classList.remove('show');
-  document.getElementById('btn3').disabled=true;
-  goTo(1);
-}
-
-async function startAnalysis(){
-  if(!selectedFile){alert('Please upload a resume first!');return;}
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('loadingScreen').classList.add('show');
-  const steps=['ls1','ls2','ls3','ls4'];
-  steps.forEach(s=>document.getElementById(s).classList.remove('active'));
-  document.getElementById('ls1').classList.add('active');
-  let i=0;
-  const iv=setInterval(()=>{
-    i++;
-    if(i<steps.length)document.getElementById(steps[i]).classList.add('active');
-    if(i>=steps.length-1)clearInterval(iv);
-  },1500);
-  const formData=new FormData();
-  formData.append('resume',selectedFile);
-  formData.append('target_role',selectedRole);
-  formData.append('degree',selectedDegree);
-  try{
-    const response=await fetch('/api/analyze',{method:'POST',body:formData});
-    const data=await response.json();
-    clearInterval(iv);
-    if(!response.ok||!data.success){
-      document.getElementById('loadingScreen').classList.remove('show');
-      document.getElementById('panel3').classList.add('active');
-      alert('Error: '+(data.error||'Something went wrong'));
-      return;
+    function showError(msg) {
+      const el = document.getElementById('loginError');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 5000);
     }
-    renderResults(data);
-  }catch(error){
-    clearInterval(iv);
-    document.getElementById('loadingScreen').classList.remove('show');
-    document.getElementById('panel3').classList.add('active');
-    alert('Network error. Is the server running?');
-  }
-}
 
-function getColor(score){
-  if(score>=80)return'#c8f135';
-  if(score>=60)return'#4f8eff';
-  if(score>=40)return'#ffb432';
-  return'#ff5f8d';
-}
+    function showLoading(show) {
+      document.getElementById('loginLoading').classList.toggle('show', show);
+    }
 
-function renderResults(data){
-  const a=data.analysis;
-  const jobs=data.jobs||[];
-  const color=getColor(a.overall_score);
-  const arc=document.getElementById('ringFill');
-  arc.style.stroke=color;
-  setTimeout(()=>{arc.style.strokeDashoffset=439.82-(a.overall_score/100)*439.82;},100);
-  let count=0;
-  const numEl=document.getElementById('scoreNum');
-  numEl.style.color=color;
-  const counter=setInterval(()=>{
-    count=Math.min(count+2,a.overall_score);
-    numEl.textContent=count;
-    if(count>=a.overall_score)clearInterval(counter);
-  },20);
-  document.getElementById('gradeBadge').textContent='Grade: '+a.grade;
-  document.getElementById('scoreSummary').textContent=a.summary;
-  document.getElementById('statIssues').textContent=a.critical_issues.length;
-  document.getElementById('statStrengths').textContent=a.strengths.length;
-  document.getElementById('statInterview').textContent=a.estimated_interview_chance||'—';
-  document.getElementById('statJobs').textContent=jobs.length;
-  const sectionMap={contact_info:{label:'Contact Info',max:10},professional_summary:{label:'Professional Summary',max:10},work_experience:{label:'Work Experience',max:25},education:{label:'Education',max:15},skills:{label:'Skills',max:20},formatting_readability:{label:'Formatting',max:15},keywords_ats:{label:'Keywords & ATS',max:15}};
-  const scoresEl=document.getElementById('sectionScores');
-  scoresEl.innerHTML='';
-  for(const[key,info]of Object.entries(sectionMap)){
-    const sec=a.section_scores[key];
-    if(!sec)continue;
-    const pct=Math.round((sec.score/info.max)*100);
-    const c=getColor(pct);
-    scoresEl.innerHTML+=`<div class="bar-item"><div class="bar-head"><span class="bar-name">${info.label}</span><span class="bar-val" style="color:${c}">${sec.score}/${info.max}</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:${c}" data-pct="${pct}"></div></div><div class="bar-fb">${sec.feedback}</div></div>`;
-  }
-  setTimeout(()=>{document.querySelectorAll('.bar-fill').forEach(el=>{el.style.width=el.dataset.pct+'%';});},200);
-  document.getElementById('strengthsList').innerHTML=a.strengths.map(s=>`<span class="tag tag-green">✓ ${s}</span>`).join('');
-  const issuesEl=document.getElementById('issuesList');
-  issuesEl.innerHTML=a.critical_issues.length===0?'<p style="color:var(--lime)">🎉 No critical issues found!</p>':a.critical_issues.map(i=>`<div class="issue ${i.severity}"><div class="issue-head"><span class="sev">${i.severity}</span><span class="issue-title">${i.issue}</span></div><div class="issue-desc">${i.description}</div><div class="fix-box">💡 ${i.fix}</div></div>`).join('');
-  document.getElementById('stepsList').innerHTML=a.step_by_step_improvements.map(s=>`<div class="step-row"><div class="step-num">${s.step}</div><div><div class="step-area">${s.area}</div><div class="step-prob">⚠️ ${s.current_problem}</div><div class="step-action">→ ${s.action}</div>${s.example?`<div class="step-example">e.g. ${s.example}</div>`:''}</div></div>`).join('');
-  document.getElementById('keywordList').innerHTML=(a.keyword_suggestions||[]).map(k=>`<span class="tag tag-blue">${k}</span>`).join('');
-  document.getElementById('missingList').innerHTML=(a.missing_sections||[]).length===0?'<span style="color:var(--lime);font-size:13px">None missing ✓</span>':a.missing_sections.map(m=>`<span class="tag tag-pink">${m}</span>`).join('');
-  const jobsEl=document.getElementById('jobsList');
-  jobsEl.innerHTML=jobs.length===0?'<p style="color:var(--muted)">No jobs found. Try again later.</p>':jobs.map(job=>`<div class="job-card"><div class="job-logo">💼</div><div class="job-info"><div class="job-title">${job.title}</div><div class="job-company">${job.company} · ${job.location}</div><div class="job-tags"><span class="jtag">${job.employment_type||'Full Time'}</span></div></div><div class="job-right"><div class="job-salary">${job.salary}</div><a class="job-apply" href="${job.apply_link}" target="_blank">Apply Now →</a></div></div>`).join('');
-  document.getElementById('loadingScreen').classList.remove('show');
-  goTo(4);
-  window.scrollTo({top:0,behavior:'smooth'});
-}
+    async function saveUserToMongo(user, loginMethod) {
+      try {
+        const token = await user.getIdToken();
+        await fetch('/api/auth/save-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({
+            name: user.displayName || user.phoneNumber || 'User',
+            email: user.email || '',
+            phone: user.phoneNumber || '',
+            photo: user.photoURL || '',
+            loginMethod,
+          })
+        });
+      } catch (e) {
+        console.error('Save user error:', e);
+      }
+    }
 
-const dropZone=document.getElementById('dropZone');
-if(dropZone){
-  dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.style.borderColor='#c8f135';});
-  dropZone.addEventListener('dragleave',()=>{dropZone.style.borderColor='';});
-  dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.style.borderColor='';const file=e.dataTransfer.files[0];if(file)handleFile({target:{files:[file]}});});
-}
-</script>
+    function showApp(user) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('mainApp').classList.add('show');
+      const name = user.displayName || user.phoneNumber || 'User';
+      document.getElementById('navName').textContent = name;
+      if (user.photoURL) {
+        document.getElementById('navAvatar').innerHTML = `<img src="${user.photoURL}" class="nav-avatar" style="width:32px;height:32px;border-radius:50%;border:2px solid var(--lime)"/>`;
+      }
+      window._firebaseUser = user;
+    }
+
+    // Check if already logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        showApp(user);
+      }
+    });
+
+    // Google Sign In
+    window.signInWithGoogle = async () => {
+      showLoading(true);
+      try {
+        const provider = new GoogleAuthProvider();
+        const result = await signInWithPopup(auth, provider);
+        await saveUserToMongo(result.user, 'google');
+        showApp(result.user);
+      } catch (e) {
+        showError('Google sign-in failed: ' + e.message);
+      } finally {
+        showLoading(false);
+      }
+    };
+
+    // Logout
+    window.logout = async () => {
+      await signOut(auth);
+      window._firebaseUser = null;
+      document.getElementById('mainApp').classList.remove('show');
+      document.getElementById('loginScreen').style.display = 'flex';
+    };
+
+    // Get token for API calls
+    window.getAuthToken = async () => {
+      if (window._firebaseUser) return await window._firebaseUser.getIdToken();
+      return null;
+    };
+  </script>
+
+  <script>
+    const rolesData = {
+      'B.Tech / B.E / M.Tech': [{icon:'💻',name:'Frontend Developer'},{icon:'⚙️',name:'Backend Developer'},{icon:'🌐',name:'Full Stack Developer'},{icon:'📱',name:'Mobile App Developer'},{icon:'🔄',name:'DevOps Engineer'},{icon:'☁️',name:'Cloud Engineer'},{icon:'📊',name:'Data Analyst'},{icon:'🤖',name:'ML / AI Engineer'},{icon:'🔐',name:'Cybersecurity Analyst'},{icon:'🏗️',name:'Embedded Systems'}],
+      'B.Com / M.Com': [{icon:'🧾',name:'Accountant'},{icon:'💰',name:'Financial Analyst'},{icon:'🏦',name:'Bank PO'},{icon:'📈',name:'Investment Analyst'},{icon:'📋',name:'Audit Associate'},{icon:'📦',name:'Operations Executive'}],
+      'B.Sc / M.Sc': [{icon:'🔬',name:'Research Analyst'},{icon:'🧪',name:'Lab Technician'},{icon:'📊',name:'Data Analyst'},{icon:'🌿',name:'Environmental Analyst'},{icon:'🎓',name:'College Lecturer'},{icon:'💊',name:'Quality Control'}],
+      'BA LLB / LLM': [{icon:'⚖️',name:'Corporate Lawyer'},{icon:'📜',name:'Litigation Lawyer'},{icon:'🏛️',name:'Legal Advisor'},{icon:'✅',name:'Compliance Officer'},{icon:'🏗️',name:'Contract Manager'},{icon:'🎯',name:'IP Attorney'}],
+      'B.Pharmacy / M.Pharmacy': [{icon:'💊',name:'Medical Representative'},{icon:'🔬',name:'Research Scientist'},{icon:'📋',name:'Regulatory Affairs'},{icon:'🏥',name:'Hospital Pharmacist'},{icon:'🧪',name:'Quality Assurance'},{icon:'📊',name:'Pharmacovigilance'}],
+      'MBBS / BDS / BAMS': [{icon:'👨‍⚕️',name:'General Physician'},{icon:'🦷',name:'Dentist'},{icon:'🌿',name:'Ayurvedic Doctor'},{icon:'🏥',name:'Medical Officer'},{icon:'📝',name:'Medical Writer'},{icon:'🔬',name:'Clinical Researcher'}],
+      'Civil / Mech / Electrical': [{icon:'🏗️',name:'Site Engineer'},{icon:'⚙️',name:'Design Engineer'},{icon:'🔧',name:'Production Engineer'},{icon:'⚡',name:'Electrical Engineer'},{icon:'🚂',name:'Railways Engineer'},{icon:'📐',name:'Project Engineer'}],
+      'BBA / MBA': [{icon:'📢',name:'Digital Marketing'},{icon:'🤝',name:'Business Development'},{icon:'👥',name:'HR Executive'},{icon:'🛒',name:'Sales Executive'},{icon:'📦',name:'Product Manager'},{icon:'🏭',name:'Operations Manager'}],
+      'B.Ed / M.Ed': [{icon:'📚',name:'School Teacher'},{icon:'🖥️',name:'Online Tutor'},{icon:'✏️',name:'Curriculum Designer'},{icon:'🎓',name:'Special Educator'},{icon:'🏫',name:'School Principal'},{icon:'📱',name:'EdTech Content'}],
+      'Hotel Management': [{icon:'🏨',name:'Hotel Manager'},{icon:'🍽️',name:'F&B Manager'},{icon:'✈️',name:'Travel Consultant'},{icon:'🎪',name:'Event Coordinator'},{icon:'🛎️',name:'Front Office Exec'},{icon:'🗺️',name:'Tour Manager'}],
+    };
+
+    let selectedDegree='', selectedRole='', selectedFile=null;
+
+    function selectDegree(el,name){ document.querySelectorAll('.degree-card').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); selectedDegree=name; document.getElementById('btn1').disabled=false; }
+    function selectRole(el,name){ document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); selectedRole=name; document.getElementById('btn2').disabled=false; }
+    function handleFile(e){ const file=e.target.files[0]; if(!file)return; selectedFile=file; document.getElementById('fileOkName').textContent=file.name; document.getElementById('fileOkSize').textContent=(file.size/1024).toFixed(1)+' KB'; document.getElementById('fileOk').classList.add('show'); document.getElementById('btn3').disabled=false; }
+
+    function goTo(step){
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      document.getElementById('loadingScreen').classList.remove('show');
+      if(step===2){ const grid=document.getElementById('roleGrid'); grid.innerHTML=''; const list=rolesData[selectedDegree]||[]; list.forEach(r=>{ grid.innerHTML+=`<div class="role-card" onclick="selectRole(this,'${r.name}')"><div class="role-icon">${r.icon}</div><div class="role-name">${r.name}</div></div>`; }); grid.innerHTML+=`<div class="role-card" onclick="selectRole(this,'Other')"><div class="role-icon">✏️</div><div class="role-name">Other / Custom</div></div>`; document.getElementById('degreeChip').textContent=selectedDegree; document.getElementById('btn2').disabled=true; }
+      if(step===3) document.getElementById('roleChip').textContent=selectedRole;
+      for(let i=1;i<=4;i++){ const b=document.getElementById('sb'+i); const l=document.getElementById('sl'+i); b.classList.remove('active','done'); if(l)l.classList.remove('done'); if(i<step){b.classList.add('done');if(l)l.classList.add('done');} if(i===step)b.classList.add('active'); }
+      if(step<=4)document.getElementById('panel'+step).classList.add('active');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    function resetAll(){ selectedDegree='';selectedRole='';selectedFile=null; document.getElementById('fileInput').value=''; document.getElementById('fileOk').classList.remove('show'); document.getElementById('btn3').disabled=true; goTo(1); }
+
+    async function startAnalysis(){
+      if(!selectedFile){alert('Please upload a resume first!');return;}
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      document.getElementById('loadingScreen').classList.add('show');
+      const steps=['ls1','ls2','ls3','ls4'];
+      steps.forEach(s=>document.getElementById(s).classList.remove('active'));
+      document.getElementById('ls1').classList.add('active');
+      let i=0;
+      const iv=setInterval(()=>{ i++; if(i<steps.length)document.getElementById(steps[i]).classList.add('active'); if(i>=steps.length-1)clearInterval(iv); },1500);
+      const token = await window.getAuthToken();
+      if(!token){ alert('Please login first!'); clearInterval(iv); return; }
+      const formData=new FormData();
+      formData.append('resume',selectedFile);
+      formData.append('target_role',selectedRole);
+      formData.append('degree',selectedDegree);
+      try{
+        const response=await fetch('/api/analyze',{method:'POST',headers:{'Authorization':`Bearer ${token}`},body:formData});
+        const data=await response.json();
+        clearInterval(iv);
+        if(!response.ok||!data.success){ document.getElementById('loadingScreen').classList.remove('show'); document.getElementById('panel3').classList.add('active'); alert('Error: '+(data.error||'Something went wrong')); return; }
+        renderResults(data);
+      }catch(error){ clearInterval(iv); document.getElementById('loadingScreen').classList.remove('show'); document.getElementById('panel3').classList.add('active'); alert('Network error. Is the server running?'); }
+    }
+
+    function getColor(score){ if(score>=80)return'#c8f135'; if(score>=60)return'#4f8eff'; if(score>=40)return'#ffb432'; return'#ff5f8d'; }
+
+    function renderResults(data){
+      const a=data.analysis; const jobs=data.jobs||[]; const color=getColor(a.overall_score);
+      const arc=document.getElementById('ringFill'); arc.style.stroke=color;
+      setTimeout(()=>{arc.style.strokeDashoffset=439.82-(a.overall_score/100)*439.82;},100);
+      let count=0; const numEl=document.getElementById('scoreNum'); numEl.style.color=color;
+      const counter=setInterval(()=>{ count=Math.min(count+2,a.overall_score); numEl.textContent=count; if(count>=a.overall_score)clearInterval(counter); },20);
+      document.getElementById('gradeBadge').textContent='Grade: '+a.grade;
+      document.getElementById('scoreSummary').textContent=a.summary;
+      document.getElementById('statIssues').textContent=a.critical_issues.length;
+      document.getElementById('statStrengths').textContent=a.strengths.length;
+      document.getElementById('statInterview').textContent=a.estimated_interview_chance||'—';
+      document.getElementById('statJobs').textContent=jobs.length;
+      const sectionMap={contact_info:{label:'Contact Info',max:10},professional_summary:{label:'Professional Summary',max:10},work_experience:{label:'Work Experience',max:25},education:{label:'Education',max:15},skills:{label:'Skills',max:20},formatting_readability:{label:'Formatting',max:15},keywords_ats:{label:'Keywords & ATS',max:15}};
+      const scoresEl=document.getElementById('sectionScores'); scoresEl.innerHTML='';
+      for(const[key,info]of Object.entries(sectionMap)){ const sec=a.section_scores[key]; if(!sec)continue; const pct=Math.round((sec.score/info.max)*100); const c=getColor(pct); scoresEl.innerHTML+=`<div class="bar-item"><div class="bar-head"><span class="bar-name">${info.label}</span><span class="bar-val" style="color:${c}">${sec.score}/${info.max}</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:${c}" data-pct="${pct}"></div></div><div class="bar-fb">${sec.feedback}</div></div>`; }
+      setTimeout(()=>{document.querySelectorAll('.bar-fill').forEach(el=>{el.style.width=el.dataset.pct+'%';});},200);
+      document.getElementById('strengthsList').innerHTML=a.strengths.map(s=>`<span class="tag tag-green">✓ ${s}</span>`).join('');
+      const issuesEl=document.getElementById('issuesList'); issuesEl.innerHTML=a.critical_issues.length===0?'<p style="color:var(--lime)">🎉 No critical issues found!</p>':a.critical_issues.map(i=>`<div class="issue ${i.severity}"><div class="issue-head"><span class="sev">${i.severity}</span><span class="issue-title">${i.issue}</span></div><div class="issue-desc">${i.description}</div><div class="fix-box">💡 ${i.fix}</div></div>`).join('');
+      document.getElementById('stepsList').innerHTML=a.step_by_step_improvements.map(s=>`<div class="step-row"><div class="step-num">${s.step}</div><div><div class="step-area">${s.area}</div><div class="step-prob">⚠️ ${s.current_problem}</div><div class="step-action">→ ${s.action}</div>${s.example?`<div class="step-example">e.g. ${s.example}</div>`:''}</div></div>`).join('');
+      document.getElementById('keywordList').innerHTML=(a.keyword_suggestions||[]).map(k=>`<span class="tag tag-blue">${k}</span>`).join('');
+      document.getElementById('missingList').innerHTML=(a.missing_sections||[]).length===0?'<span style="color:var(--lime);font-size:13px">None missing ✓</span>':a.missing_sections.map(m=>`<span class="tag tag-pink">${m}</span>`).join('');
+      const jobsEl=document.getElementById('jobsList'); jobsEl.innerHTML=jobs.length===0?'<p style="color:var(--muted)">No jobs found. Try again later.</p>':jobs.map(job=>`<div class="job-card"><div class="job-logo">💼</div><div class="job-info"><div class="job-title">${job.title}</div><div class="job-company">${job.company} · ${job.location}</div><div class="job-tags"><span class="jtag">${job.employment_type||'Full Time'}</span></div></div><div class="job-right"><div class="job-salary">${job.salary}</div><a class="job-apply" href="${job.apply_link}" target="_blank">Apply Now →</a></div></div>`).join('');
+      document.getElementById('loadingScreen').classList.remove('show');
+      goTo(4);
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    const dropZone=document.getElementById('dropZone');
+    if(dropZone){ dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.style.borderColor='#c8f135';}); dropZone.addEventListener('dragleave',()=>{dropZone.style.borderColor='';}); dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.style.borderColor='';const file=e.dataTransfer.files[0];if(file)handleFile({target:{files:[file]}});}); }
+  </script>
 </body>
 </html>

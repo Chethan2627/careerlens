@@ -7,8 +7,11 @@ const cors = require('cors');
 const axios = require('axios');
 const path = require('node:path');
 const Groq = require('groq-sdk');
+const mongoose = require('mongoose');
+const admin = require('firebase-admin');
+const User = require('./models/User');
 
-// ── PART 2: App Setup ──────────────────────────────
+// ── App Setup ──────────────────────────────────────
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -16,15 +19,27 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ── MongoDB Connection ─────────────────────────────
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('✅ MongoDB connected!'))
+  .catch(err => console.error('❌ MongoDB error:', err.message));
+
+// ── Firebase Admin Setup ───────────────────────────
+admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId:   process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey:  process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  }),
+});
+console.log('✅ Firebase Admin initialized!');
+
 // ── File Upload Config ─────────────────────────────
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    if (
-      file.mimetype === 'application/pdf' ||
-      file.mimetype === 'text/plain'
-    ) {
+    if (file.mimetype === 'application/pdf' || file.mimetype === 'text/plain') {
       cb(null, true);
     } else {
       cb(new Error('Only PDF and TXT files allowed'), false);
@@ -32,10 +47,26 @@ const upload = multer({
   }
 });
 
-// ── Groq Client Setup ──────────────────────────────
+// ── Groq Client ────────────────────────────────────
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-// ── PART 3: Extract Text from Uploaded File ────────
+// ── Auth Middleware ────────────────────────────────
+async function verifyToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized - No token provided' });
+  }
+  const token = authHeader.split('Bearer ')[1];
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Unauthorized - Invalid token' });
+  }
+}
+
+// ── PART 3: Extract Text ───────────────────────────
 async function extractText(file) {
   if (file.mimetype === 'application/pdf') {
     const pdfParse = (await import('pdf-parse')).default;
@@ -46,9 +77,8 @@ async function extractText(file) {
   }
 }
 
-// ── PART 4: Score Resume with Groq AI ─────────────
+// ── PART 4: Score Resume ───────────────────────────
 async function scoreResume(resumeText, targetRole, degree) {
-
   const prompt = `You are an expert HR professional and resume coach with 15+ years of experience hiring for ${degree} graduates in India.
 
 The candidate is targeting: ${targetRole}
@@ -72,11 +102,7 @@ Return exactly this JSON structure:
     "formatting_readability": { "score": <0-15>, "feedback": "<feedback>" },
     "keywords_ats": { "score": <0-15>, "feedback": "<feedback>" }
   },
-  "strengths": [
-    "<strength 1>",
-    "<strength 2>",
-    "<strength 3>"
-  ],
+  "strengths": ["<strength 1>","<strength 2>","<strength 3>"],
   "critical_issues": [
     {
       "issue": "<title>",
@@ -114,22 +140,19 @@ Return exactly this JSON structure:
 // ── PART 5: Fetch Live Jobs ────────────────────────
 async function fetchLiveJobs(targetRole, degree) {
   try {
-    const response = await axios.get(
-      'https://jsearch.p.rapidapi.com/search',
-      {
-        params: {
-          query: `${targetRole} in India`,
-          page: '1',
-          num_pages: '1',
-          date_posted: 'today',
-          country: 'in',
-        },
-        headers: {
-          'x-rapidapi-key': process.env.JSEARCH_API_KEY,
-          'x-rapidapi-host': 'jsearch.p.rapidapi.com',
-        },
-      }
-    );
+    const response = await axios.get('https://jsearch.p.rapidapi.com/search', {
+      params: {
+        query: `${targetRole} in India`,
+        page: '1',
+        num_pages: '1',
+        date_posted: 'today',
+        country: 'in',
+      },
+      headers: {
+        'x-rapidapi-key': process.env.JSEARCH_API_KEY,
+        'x-rapidapi-host': 'jsearch.p.rapidapi.com',
+      },
+    });
     const jobs = response.data.data || [];
     return jobs.slice(0, 8).map((job) => ({
       title: job.job_title,
@@ -141,9 +164,7 @@ async function fetchLiveJobs(targetRole, degree) {
         : 'Salary not disclosed',
       apply_link: job.job_apply_link,
       posted: job.job_posted_at_datetime_utc,
-      description: job.job_description
-        ? job.job_description.slice(0, 200) + '...'
-        : '',
+      description: job.job_description ? job.job_description.slice(0, 200) + '...' : '',
     }));
   } catch (error) {
     console.error('Jobs API error:', error.message);
@@ -156,8 +177,36 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Server is running!' });
 });
 
-// ── PART 6: Main API Route ─────────────────────────
-app.post('/api/analyze', upload.single('resume'), async (req, res) => {
+// ── Save / Update User After Login ────────────────
+app.post('/api/auth/save-user', verifyToken, async (req, res) => {
+  try {
+    const { name, email, phone, photo, loginMethod } = req.body;
+    const firebaseUid = req.user.uid;
+
+    let user = await User.findOne({ firebaseUid });
+
+    if (user) {
+      user.lastLogin = new Date();
+      user.name = name || user.name;
+      user.photo = photo || user.photo;
+      await user.save();
+      return res.json({ success: true, user, isNew: false });
+    }
+
+    user = new User({ firebaseUid, name, email, phone, photo, loginMethod });
+    await user.save();
+
+    console.log('👤 New user saved:', name, loginMethod);
+    res.json({ success: true, user, isNew: true });
+
+  } catch (err) {
+    console.error('Save user error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Main Analyze Route (Protected) ────────────────
+app.post('/api/analyze', verifyToken, upload.single('resume'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No resume file uploaded' });
@@ -167,7 +216,8 @@ app.post('/api/analyze', upload.single('resume'), async (req, res) => {
     const degree     = req.body.degree || 'B.Tech';
 
     console.log('─────────────────────────────────');
-    console.log('📄 File received:', req.file.originalname);
+    console.log('👤 User         :', req.user.email || req.user.phone_number || req.user.uid);
+    console.log('📄 File         :', req.file.originalname);
     console.log('🎯 Target Role  :', targetRole);
     console.log('🎓 Degree       :', degree);
     console.log('─────────────────────────────────');
@@ -175,18 +225,28 @@ app.post('/api/analyze', upload.single('resume'), async (req, res) => {
     const resumeText = await extractText(req.file);
 
     if (!resumeText || resumeText.trim().length < 50) {
-      return res.status(400).json({
-        error: 'Could not read resume. Make sure PDF is not image based.'
-      });
+      return res.status(400).json({ error: 'Could not read resume. Make sure PDF is not image based.' });
     }
-
-    console.log('✅ Text extracted:', resumeText.length, 'characters');
-    console.log('🤖 Sending to Groq AI...');
 
     const [analysis, jobs] = await Promise.all([
       scoreResume(resumeText, targetRole, degree),
       fetchLiveJobs(targetRole, degree),
     ]);
+
+    // Save scan to user history
+    await User.findOneAndUpdate(
+      { firebaseUid: req.user.uid },
+      {
+        $push: {
+          scanHistory: {
+            targetRole,
+            degree,
+            overallScore: analysis.overall_score,
+            grade: analysis.grade,
+          }
+        }
+      }
+    );
 
     console.log('✅ Score         :', analysis.overall_score + '/100');
     console.log('✅ Jobs found    :', jobs.length);
@@ -195,38 +255,34 @@ app.post('/api/analyze', upload.single('resume'), async (req, res) => {
     res.json({
       success: true,
       filename: req.file.originalname,
-      targetRole: targetRole,
-      degree: degree,
-      analysis: analysis,
-      jobs: jobs,
+      targetRole,
+      degree,
+      analysis,
+      jobs,
     });
 
   } catch (error) {
     console.error('❌ Error:', error.message);
-    res.status(500).json({
-      error: error.message || 'Something went wrong'
-    });
+    res.status(500).json({ error: error.message || 'Something went wrong' });
   }
 });
 
-// ── PART 7: Start The Server ───────────────────────
+// ── Serve Frontend ─────────────────────────────────
 app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// ── Start Server ───────────────────────────────────
 app.listen(PORT, () => {
   console.log('');
   console.log('🚀 CareerLens server started!');
   console.log('─────────────────────────────────');
-  console.log('🌐 Open in browser:');
-  console.log('   http://localhost:' + PORT);
+  console.log('🌐 http://localhost:' + PORT);
   console.log('─────────────────────────────────');
-  console.log('🔑 Groq API Key:',
-    process.env.GROQ_API_KEY ? '✅ Found' : '❌ Missing!'
-  );
-  console.log('🔑 JSearch API Key:',
-    process.env.JSEARCH_API_KEY ? '✅ Found' : '❌ Missing!'
-  );
+  console.log('🔑 Groq API Key    :', process.env.GROQ_API_KEY     ? '✅ Found' : '❌ Missing!');
+  console.log('🔑 JSearch API Key :', process.env.JSEARCH_API_KEY  ? '✅ Found' : '❌ Missing!');
+  console.log('🔑 MongoDB URI     :', process.env.MONGODB_URI      ? '✅ Found' : '❌ Missing!');
+  console.log('🔑 Firebase        :', process.env.FIREBASE_PROJECT_ID ? '✅ Found' : '❌ Missing!');
   console.log('─────────────────────────────────');
   console.log('');
 });
